@@ -1,20 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import './global.css';
+import React, { useState } from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { useColorScheme } from 'react-native';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { useDbMigrations } from './src/database/db';
+import { LoadingScreen, ErrorScreen } from './src/screens';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  const colorScheme = useColorScheme();
+  // key is used to remount the hook on retry
+  const [retryKey, setRetryKey] = useState(0);
+
+  return <AppContent key={retryKey} onRetry={() => setRetryKey(k => k + 1)} theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} />;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+function AppContent({ onRetry, theme }: { onRetry: () => void, theme: any }) {
+  const { success, error } = useDbMigrations();
+
+  if (error) {
+    return <ErrorScreen error={error.message} onRetry={onRetry} />;
+  }
+
+  if (!success) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <NavigationContainer theme={theme}>
+      <RootNavigator />
+    </NavigationContainer>
+  );
+}
