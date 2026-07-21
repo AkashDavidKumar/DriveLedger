@@ -1,15 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { WorkEntryService } from '../../services/WorkEntryService';
 
 export function HistoryScreen() {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  
+  const initialFilters = route.params?.filters || {};
+
   const [history, setHistory] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string | null>(initialFilters.salaryStatuses?.[0] || null);
 
   const loadData = useCallback(async () => {
     try {
@@ -80,7 +84,7 @@ export function HistoryScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity 
             className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl mb-3 shadow-sm border border-slate-100 dark:border-slate-700"
-            onPress={() => navigation.navigate('WorkStack', { screen: 'WorkDetails', params: { workEntryId: item.entry.id } })}
+            onPress={() => navigation.navigate('WorkDetails', { workEntryId: item.entry.id })}
           >
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-slate-500 font-bold">{item.entry.date}</Text>

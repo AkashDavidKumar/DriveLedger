@@ -2,6 +2,7 @@ import { eq, desc } from 'drizzle-orm';
 import { db } from '../database/db';
 import { workEntries, salaryPayments, owners, vehicles } from '../database/schema';
 import * as Crypto from 'expo-crypto';
+import { ReportService } from './ReportService';
 
 export class SalaryPaymentService {
   static async addPayment(workEntryId: string, amount: number, paymentDate: string, notes?: string) {
@@ -42,6 +43,7 @@ export class SalaryPaymentService {
       salaryStatus: newStatus
     }).where(eq(workEntries.id, workEntryId));
 
+    ReportService.invalidateCache();
     return id;
   }
 

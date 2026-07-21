@@ -9,9 +9,10 @@ const Placeholder = ({ name }: { name: string }) => (
 
 export * from './DashboardScreen';
 export * from './work/HistoryScreen';
+export * from './calendar/CalendarScreen';
+export * from './reports/ReportsScreen';
 export * from './salary/SalaryScreen';
-export const ReportsScreen = () => <Placeholder name="Reports" />;
-export const SettingsScreen = () => <Placeholder name="Settings" />;
+export * from './settings/BackupScreen';
 
 export * from './work/StartWorkScreen';
 export * from './work/ActiveWorkScreen';

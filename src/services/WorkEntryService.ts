@@ -3,6 +3,7 @@ import { db } from '../database/db';
 import { workEntries, trips, photos, salaryPayments, owners, vehicles } from '../database/schema';
 import * as Crypto from 'expo-crypto';
 import { SalaryCalculatorService } from './SalaryCalculatorService';
+import { ReportService } from './ReportService';
 
 export class WorkEntryService {
   static async getActiveWorkEntry() {
@@ -67,6 +68,7 @@ export class WorkEntryService {
       createdAt: Date.now(),
     });
 
+    ReportService.invalidateCache();
     return id;
   }
 
@@ -103,6 +105,7 @@ export class WorkEntryService {
     }
 
     await db.update(workEntries).set(updates).where(eq(workEntries.id, id));
+    ReportService.invalidateCache();
   }
 
   static async finishWorkEntry(id: string, data: { endTime: string; hours: number }) {
@@ -121,6 +124,8 @@ export class WorkEntryService {
       status: 'finished',
       isCompleted: true,
     }).where(eq(workEntries.id, id));
+    
+    ReportService.invalidateCache();
   }
 
   static async deleteWorkEntry(id: string) {
@@ -129,6 +134,8 @@ export class WorkEntryService {
     await db.delete(photos).where(eq(photos.workEntryId, id));
     await db.delete(salaryPayments).where(eq(salaryPayments.workEntryId, id));
     await db.delete(workEntries).where(eq(workEntries.id, id));
+    
+    ReportService.invalidateCache();
   }
 
   static async getHistory(filters: {

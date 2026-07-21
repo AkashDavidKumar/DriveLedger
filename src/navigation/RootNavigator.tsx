@@ -11,8 +11,11 @@ import {
   WorkDetailsScreen,
   EditWorkScreen,
   OwnersListScreen,
-  VehiclesListScreen
+  VehiclesListScreen,
+  HistoryScreen
 } from '../screens';
+
+import { WorkStackNavigator } from './WorkStackNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -20,6 +23,8 @@ export function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs" component={BottomTabNavigator} />
+      <Stack.Screen name="WorkStack" component={WorkStackNavigator} />
+      <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: true, title: 'History' }} />
       <Stack.Group screenOptions={{ presentation: 'modal', headerShown: true }}>
         <Stack.Screen name="AddOwner" component={AddOwnerScreen} options={{ title: 'Add Owner' }} />
         <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ title: 'Add Vehicle' }} />
