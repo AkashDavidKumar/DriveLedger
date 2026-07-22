@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SalaryPaymentService } from '../../services/SalaryPaymentService';
 import dayjs from 'dayjs';
 
 export function AddPaymentScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { workEntryId } = route.params;
 
   const [amount, setAmount] = useState('');
@@ -31,7 +33,10 @@ export function AddPaymentScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4 pt-4"
+      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+    >
       <Text className="text-2xl font-bold text-black dark:text-white mb-6">Add Payment</Text>
 
       <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Amount (₹)</Text>

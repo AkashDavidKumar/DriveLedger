@@ -13,6 +13,7 @@ export * from './calendar/CalendarScreen';
 export * from './reports/ReportsScreen';
 export * from './salary/SalaryScreen';
 export * from './settings/BackupScreen';
+export * from './settings/SettingsScreen';
 
 export * from './work/StartWorkScreen';
 export * from './work/ActiveWorkScreen';
@@ -27,6 +28,8 @@ export * from './work/EditWorkScreen';
 
 export * from './modals/OwnersListScreen';
 export * from './modals/VehiclesListScreen';
+export * from './modals/EditOwnerScreen';
+export * from './modals/EditVehicleScreen';
 
 export const LoadingScreen = () => (
   <View className="flex-1 items-center justify-center bg-white dark:bg-slate-900">

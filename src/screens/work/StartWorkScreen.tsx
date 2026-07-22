@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import dayjs from 'dayjs';
 
@@ -11,6 +12,7 @@ import { WorkEntryService } from '../../services/WorkEntryService';
 
 export function StartWorkScreen() {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   
   const [loading, setLoading] = useState(true);
   const [owners, setOwners] = useState<any[]>([]);
@@ -25,36 +27,41 @@ export function StartWorkScreen() {
   const [pickupLocation, setPickupLocation] = useState('');
   const [notes, setNotes] = useState('');
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const activeEntry = await WorkEntryService.getActiveWorkEntry();
-        if (activeEntry) {
-          navigation.replace('ActiveWork', { workEntryId: activeEntry.id });
-          return;
-        }
-
-        const [ownersData, vehiclesData] = await Promise.all([
-          OwnerService.getActiveOwners(),
-          VehicleService.getVehicles()
-        ]);
-        
-        setOwners(ownersData);
-        setVehicles(vehiclesData);
-        
-        if (ownersData.length > 0) setOwnerId(ownersData[0].id);
-        if (vehiclesData.length > 0) {
-          setVehicleId(vehiclesData[0].id);
-          setPaymentType(vehiclesData[0].defaultPaymentMethod);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+  const loadData = useCallback(async () => {
+    try {
+      const activeEntry = await WorkEntryService.getActiveWorkEntry();
+      if (activeEntry) {
+        navigation.replace('ActiveWork', { workEntryId: activeEntry.id });
+        return;
       }
+
+      const [ownersData, vehiclesData] = await Promise.all([
+        OwnerService.getActiveOwners(),
+        VehicleService.getVehicles()
+      ]);
+      
+      setOwners(ownersData);
+      setVehicles(vehiclesData);
+      
+      if (ownersData.length > 0 && !ownersData.find(o => o.id === ownerId)) {
+        setOwnerId(ownersData[0].id);
+      }
+      if (vehiclesData.length > 0 && !vehiclesData.find(v => v.id === vehicleId)) {
+        setVehicleId(vehiclesData[0].id);
+        setPaymentType(vehiclesData[0].defaultPaymentMethod);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    loadData();
-  }, [navigation]);
+  }, [navigation, ownerId, vehicleId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   useEffect(() => {
     async function updateRate() {
@@ -103,22 +110,43 @@ export function StartWorkScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
+    >
       <Text className="text-2xl font-bold text-black dark:text-white mb-6">Start Work</Text>
 
       <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Owner</Text>
-      <View className="border border-slate-300 dark:border-slate-700 rounded-xl mb-4 overflow-hidden bg-slate-50 dark:bg-slate-800">
-        <Picker selectedValue={ownerId} onValueChange={(v) => setOwnerId(v)} style={{ color: 'gray' }}>
-          {owners.map(o => <Picker.Item key={o.id} label={o.name} value={o.id} />)}
-        </Picker>
-      </View>
+      {owners.length > 0 ? (
+        <View className="border border-slate-300 dark:border-slate-700 rounded-xl mb-4 overflow-hidden bg-slate-50 dark:bg-slate-800">
+          <Picker selectedValue={ownerId} onValueChange={(v) => setOwnerId(v)} style={{ color: 'gray' }}>
+            {owners.map(o => <Picker.Item key={o.id} label={o.name} value={o.id} />)}
+          </Picker>
+        </View>
+      ) : (
+        <View className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl mb-4 border border-red-100 dark:border-red-900">
+          <Text className="text-red-600 dark:text-red-400 font-bold mb-2 text-center">No owners found.{"\n"}Please add your first owner.</Text>
+          <TouchableOpacity className="bg-red-500 rounded-lg p-3 items-center" onPress={() => navigation.navigate('OwnersList')}>
+            <Text className="text-white font-bold">Go to Owner Management</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Vehicle</Text>
-      <View className="border border-slate-300 dark:border-slate-700 rounded-xl mb-4 overflow-hidden bg-slate-50 dark:bg-slate-800">
-        <Picker selectedValue={vehicleId} onValueChange={(v) => setVehicleId(v)} style={{ color: 'gray' }}>
-          {vehicles.map(v => <Picker.Item key={v.id} label={`${v.name} (${v.type})`} value={v.id} />)}
-        </Picker>
-      </View>
+      {vehicles.length > 0 ? (
+        <View className="border border-slate-300 dark:border-slate-700 rounded-xl mb-4 overflow-hidden bg-slate-50 dark:bg-slate-800">
+          <Picker selectedValue={vehicleId} onValueChange={(v) => setVehicleId(v)} style={{ color: 'gray' }}>
+            {vehicles.map(v => <Picker.Item key={v.id} label={`${v.name} (${v.type})`} value={v.id} />)}
+          </Picker>
+        </View>
+      ) : (
+        <View className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl mb-4 border border-orange-100 dark:border-orange-900">
+          <Text className="text-orange-600 dark:text-orange-400 font-bold mb-2 text-center">No vehicles found.{"\n"}Please add your first vehicle.</Text>
+          <TouchableOpacity className="bg-orange-500 rounded-lg p-3 items-center" onPress={() => navigation.navigate('VehiclesList')}>
+            <Text className="text-white font-bold">Go to Vehicle Management</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Payment Type</Text>
       <View className="border border-slate-300 dark:border-slate-700 rounded-xl mb-4 overflow-hidden bg-slate-50 dark:bg-slate-800">

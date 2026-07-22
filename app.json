@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "DriveLedger",
-    "slug": "DriveLedger",
+    "slug": "driveledger",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,6 +10,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.akashdk.driveledger",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -23,7 +25,14 @@
     },
     "plugins": [
       "expo-sqlite",
-      "expo-sharing"
-    ]
+      "expo-sharing",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "060d65da-61ab-4752-9674-80d6b5473ce3"
+      }
+    },
+    "owner": "akashdk"
   }
 }

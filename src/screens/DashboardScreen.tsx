@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WorkEntryService } from '../services/WorkEntryService';
 import { DashboardService } from '../services/DashboardService';
 
 export function DashboardScreen() {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [activeWork, setActiveWork] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
 
@@ -31,7 +33,10 @@ export function DashboardScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-slate-50 dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-slate-50 dark:bg-slate-900 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
+    >
       <View className="mb-6 mt-4">
         <Text className="text-3xl font-bold text-slate-800 dark:text-white">DriveLedger</Text>
         <Text className="text-slate-500">Your Personal Work Manager</Text>

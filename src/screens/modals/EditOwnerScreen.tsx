@@ -1,29 +1,60 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { OwnerSchema, OwnerFormData } from '../../models/Schemas';
 import { OwnerService } from '../../services/OwnerService';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Picker } from '@react-native-picker/picker';
 
-export function AddOwnerScreen() {
+export function EditOwnerScreen() {
   const navigation = useNavigation();
+  const route = useRoute<any>();
   const insets = useSafeAreaInsets();
-  const { control, handleSubmit, formState: { errors } } = useForm<OwnerFormData>({
+  const ownerId = route.params?.ownerId;
+
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<OwnerFormData & { isActive: boolean }>({
+    // @ts-ignore
     resolver: zodResolver(OwnerSchema),
-    defaultValues: { name: '', phoneNumber: '', village: '', notes: '' }
+    defaultValues: { name: '', phoneNumber: '', village: '', notes: '', isActive: true }
   });
 
-  const onSubmit = async (data: OwnerFormData) => {
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    async function loadOwner() {
+      try {
+        const owner = await OwnerService.getOwnerById(ownerId);
+        if (owner) {
+          reset({
+            name: owner.name,
+            phoneNumber: owner.phoneNumber || '',
+            village: owner.village || '',
+            notes: owner.notes || '',
+            isActive: !!owner.isActive
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadOwner();
+  }, [ownerId, reset]);
+
+  const onSubmit = async (data: OwnerFormData & { isActive: boolean }) => {
     try {
-      await OwnerService.createOwner(data);
-      Alert.alert('Success', 'Owner added successfully');
+      await OwnerService.updateOwner(ownerId, data);
+      Alert.alert('Success', 'Owner updated successfully');
       navigation.goBack();
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to save owner');
+      Alert.alert('Error', e.message || 'Failed to update owner');
     }
   };
+
+  if (loading) return <View className="flex-1 items-center justify-center"><ActivityIndicator /></View>;
 
   return (
     <ScrollView 
@@ -69,24 +100,6 @@ export function AddOwnerScreen() {
       </View>
 
       <View className="mb-4">
-        <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Village</Text>
-        <Controller
-          control={control}
-          name="village"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="border border-slate-300 dark:border-slate-700 rounded-xl p-4 text-black dark:text-white"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Village Name"
-              placeholderTextColor="#94a3b8"
-            />
-          )}
-        />
-      </View>
-
-      <View className="mb-6">
         <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Notes</Text>
         <Controller
           control={control}
@@ -106,11 +119,27 @@ export function AddOwnerScreen() {
         />
       </View>
 
+      <View className="mb-6">
+        <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Status</Text>
+        <View className="border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 overflow-hidden">
+          <Controller
+            control={control}
+            name="isActive"
+            render={({ field: { onChange, value } }) => (
+              <Picker selectedValue={value} onValueChange={onChange} style={{ color: 'gray' }}>
+                <Picker.Item label="Active" value={true} />
+                <Picker.Item label="Inactive" value={false} />
+              </Picker>
+            )}
+          />
+        </View>
+      </View>
+
       <TouchableOpacity
-        className="bg-primary rounded-xl p-4 items-center"
-        onPress={handleSubmit(onSubmit)}
+        className="bg-primary rounded-xl p-4 items-center mb-10"
+        onPress={handleSubmit(onSubmit as any)}
       >
-        <Text className="text-white font-bold text-lg">Save Owner</Text>
+        <Text className="text-white font-bold text-lg">Update Owner</Text>
       </TouchableOpacity>
     </ScrollView>
   );

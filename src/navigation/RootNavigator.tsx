@@ -12,7 +12,10 @@ import {
   EditWorkScreen,
   OwnersListScreen,
   VehiclesListScreen,
-  HistoryScreen
+  HistoryScreen,
+  BackupScreen,
+  EditOwnerScreen,
+  EditVehicleScreen
 } from '../screens';
 
 import { WorkStackNavigator } from './WorkStackNavigator';
@@ -34,6 +37,9 @@ export function RootNavigator() {
         <Stack.Screen name="EditWork" component={EditWorkScreen} options={{ title: 'Edit Work' }} />
         <Stack.Screen name="OwnersList" component={OwnersListScreen} options={{ title: 'Manage Owners' }} />
         <Stack.Screen name="VehiclesList" component={VehiclesListScreen} options={{ title: 'Manage Vehicles' }} />
+        <Stack.Screen name="Backup" component={BackupScreen as any} options={{ title: 'Backup & Restore' }} />
+        <Stack.Screen name="EditOwner" component={EditOwnerScreen as any} options={{ title: 'Edit Owner' }} />
+        <Stack.Screen name="EditVehicle" component={EditVehicleScreen as any} options={{ title: 'Edit Vehicle' }} />
       </Stack.Group>
     </Stack.Navigator>
   );

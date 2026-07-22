@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 
@@ -13,6 +14,7 @@ import { VehicleService } from '../../services/VehicleService';
 export function ActiveWorkScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { workEntryId } = route.params;
 
   const [entry, setEntry] = useState<any>(null);
@@ -97,7 +99,10 @@ export function ActiveWorkScreen() {
   const expectedSalary = SalaryCalculatorService.calculateSalary(entry.paymentType, entry.rate, currentHours);
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
+    >
       <View className="flex-row justify-between items-center mb-6">
         <Text className="text-2xl font-bold text-black dark:text-white">Active Work</Text>
         <View className="bg-emerald-100 dark:bg-emerald-900 px-3 py-1 rounded-full">

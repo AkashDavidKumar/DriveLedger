@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WorkEntryService } from '../../services/WorkEntryService';
 
 export function WorkDetailsScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { workEntryId } = route.params;
 
   const [data, setData] = useState<any>(null);
@@ -55,7 +57,10 @@ export function WorkDetailsScreen() {
   const { entry, owner, vehicle } = data;
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4 pt-4"
+      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+    >
       <View className="flex-row justify-between items-center mb-6">
         <Text className="text-3xl font-bold text-black dark:text-white">Work Details</Text>
         <View className="flex-row">

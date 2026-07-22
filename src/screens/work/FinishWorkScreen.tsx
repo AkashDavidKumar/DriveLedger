@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import dayjs from 'dayjs';
 
 import { WorkEntryService } from '../../services/WorkEntryService';
@@ -11,6 +12,7 @@ import { VehicleService } from '../../services/VehicleService';
 export function FinishWorkScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { workEntryId } = route.params;
 
   const [entry, setEntry] = useState<any>(null);
@@ -66,7 +68,10 @@ export function FinishWorkScreen() {
   const expectedSalary = SalaryCalculatorService.calculateSalary(entry.paymentType, entry.rate, hours);
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
+    >
       <Text className="text-3xl font-bold text-black dark:text-white mb-6">Review & Finish</Text>
 
       <View className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl mb-6 shadow-sm border border-slate-100 dark:border-slate-700">

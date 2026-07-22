@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WorkEntryService } from '../../services/WorkEntryService';
 
 export function EditWorkScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { workEntryId } = route.params;
 
   const [notes, setNotes] = useState('');
@@ -45,7 +47,10 @@ export function EditWorkScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <ScrollView 
+      className="flex-1 bg-white dark:bg-slate-900 px-4 pt-4"
+      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+    >
       <Text className="text-2xl font-bold text-black dark:text-white mb-6">Edit Work Details</Text>
 
       <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Rate (₹)</Text>

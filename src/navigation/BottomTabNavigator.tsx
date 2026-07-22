@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabParamList } from './types';
 
-import { DashboardScreen, CalendarScreen, ReportsScreen, SalaryScreen, BackupScreen } from '../screens';
+import { DashboardScreen, CalendarScreen, ReportsScreen, SalaryScreen, SettingsScreen } from '../screens';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -14,7 +14,7 @@ export function BottomTabNavigator() {
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="calendar" size={24} color={color} /> }} />
       <Tab.Screen name="Reports" component={ReportsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="bar-chart" size={24} color={color} /> }} />
       <Tab.Screen name="Salary" component={SalaryScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="wallet" size={24} color={color} /> }} />
-      <Tab.Screen name="Settings" component={BackupScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="settings" size={24} color={color} /> }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarIcon: ({ color }) => <Ionicons name="settings" size={24} color={color} /> }} />
     </Tab.Navigator>
   );
 }

@@ -1,31 +1,61 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VehicleSchema, VehicleFormData } from '../../models/Schemas';
 import { VehicleService } from '../../services/VehicleService';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 
-export function AddVehicleScreen() {
+export function EditVehicleScreen() {
   const navigation = useNavigation();
+  const route = useRoute<any>();
   const insets = useSafeAreaInsets();
-  const { control, handleSubmit, formState: { errors } } = useForm<VehicleFormData>({
+  const vehicleId = route.params?.vehicleId;
+
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<VehicleFormData & { isActive: boolean }>({
     // @ts-ignore
     resolver: zodResolver(VehicleSchema),
-    defaultValues: { name: '', registrationNumber: '', type: 'Tractor', defaultPaymentMethod: 'per_day', defaultRate: 0 }
+    defaultValues: { name: '', registrationNumber: '', type: 'Tractor', defaultPaymentMethod: 'per_day', defaultRate: 0, isActive: true }
   });
 
-  const onSubmit = async (data: VehicleFormData) => {
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    async function loadVehicle() {
+      try {
+        const vehicle = await VehicleService.getVehicleById(vehicleId);
+        if (vehicle) {
+          reset({
+            name: vehicle.name,
+            registrationNumber: vehicle.registrationNumber || '',
+            type: vehicle.type as any,
+            defaultPaymentMethod: vehicle.defaultPaymentMethod as any,
+            defaultRate: vehicle.defaultRate,
+            isActive: !!vehicle.isActive
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadVehicle();
+  }, [vehicleId, reset]);
+
+  const onSubmit = async (data: VehicleFormData & { isActive: boolean }) => {
     try {
-      await VehicleService.createVehicle(data);
-      Alert.alert('Success', 'Vehicle added successfully');
+      await VehicleService.updateVehicle(vehicleId, data);
+      Alert.alert('Success', 'Vehicle updated successfully');
       navigation.goBack();
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to save vehicle');
+      Alert.alert('Error', e.message || 'Failed to update vehicle');
     }
   };
+
+  if (loading) return <View className="flex-1 items-center justify-center"><ActivityIndicator /></View>;
 
   return (
     <ScrollView 
@@ -125,11 +155,27 @@ export function AddVehicleScreen() {
         {errors.defaultRate && <Text className="text-danger text-sm mt-1">{errors.defaultRate.message}</Text>}
       </View>
 
+      <View className="mb-6">
+        <Text className="text-slate-700 dark:text-slate-300 font-bold mb-1">Status</Text>
+        <View className="border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 overflow-hidden">
+          <Controller
+            control={control}
+            name="isActive"
+            render={({ field: { onChange, value } }) => (
+              <Picker selectedValue={value} onValueChange={onChange} style={{ color: 'gray' }}>
+                <Picker.Item label="Active" value={true} />
+                <Picker.Item label="Inactive" value={false} />
+              </Picker>
+            )}
+          />
+        </View>
+      </View>
+
       <TouchableOpacity
-        className="bg-primary rounded-xl p-4 items-center mt-4"
+        className="bg-primary rounded-xl p-4 items-center mb-10"
         onPress={handleSubmit(onSubmit as any)}
       >
-        <Text className="text-white font-bold text-lg">Save Vehicle</Text>
+        <Text className="text-white font-bold text-lg">Update Vehicle</Text>
       </TouchableOpacity>
     </ScrollView>
   );

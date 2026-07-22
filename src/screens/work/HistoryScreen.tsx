@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WorkEntryService } from '../../services/WorkEntryService';
 
 export function HistoryScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const insets = useSafeAreaInsets();
   
   const initialFilters = route.params?.filters || {};
 
@@ -79,7 +81,7 @@ export function HistoryScreen() {
       <FlatList
         data={history}
         keyExtractor={item => item.entry.id}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
         ListEmptyComponent={<Text className="text-center text-slate-500 mt-10">No history found</Text>}
         renderItem={({ item }) => (
           <TouchableOpacity 

@@ -17,6 +17,7 @@ export const vehicles = sqliteTable('vehicles', {
   type: text('type').notNull(),
   defaultPaymentMethod: text('default_payment_method').notNull(),
   defaultRate: real('default_rate').notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).default(true),
   createdAt: integer('created_at').notNull(),
 });
 

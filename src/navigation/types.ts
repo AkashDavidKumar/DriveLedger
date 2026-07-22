@@ -26,6 +26,9 @@ export type RootStackParamList = {
   EditWork: { workEntryId: string };
   OwnersList: undefined;
   VehiclesList: undefined;
+  Backup: undefined;
+  EditOwner: { ownerId: string };
+  EditVehicle: { vehicleId: string };
 };
 
 declare global {

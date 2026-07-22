@@ -1,0 +1,1 @@
+ALTER TABLE `vehicles` ADD `is_active` integer DEFAULT true;

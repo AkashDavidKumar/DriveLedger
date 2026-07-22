@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Calendar } from 'react-native-calendars';
 import dayjs from 'dayjs';
 import { CalendarService } from '../../services/CalendarService';
@@ -8,6 +9,7 @@ import { ReportService } from '../../services/ReportService';
 
 export function CalendarScreen() {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [currentMonth, setCurrentMonth] = useState(dayjs().format('YYYY-MM'));
   
@@ -58,7 +60,10 @@ export function CalendarScreen() {
   };
 
   return (
-    <View className="flex-1 bg-slate-50 dark:bg-slate-900">
+    <View 
+      className="flex-1 bg-slate-50 dark:bg-slate-900"
+      style={{ paddingTop: insets.top }}
+    >
       <Calendar
         current={selectedDate}
         onDayPress={handleDayPress}
@@ -105,7 +110,7 @@ export function CalendarScreen() {
       <FlatList
         data={dayEntries}
         keyExtractor={item => item.entry.id}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 24 }}
         ListEmptyComponent={<Text className="text-center text-slate-500 mt-4">No work recorded this day</Text>}
         renderItem={({ item }) => (
           <TouchableOpacity 

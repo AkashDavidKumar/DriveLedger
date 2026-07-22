@@ -2,12 +2,14 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { OwnerService } from '../../services/OwnerService';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 export function OwnersListScreen() {
   const [owners, setOwners] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const loadOwners = useCallback(async () => {
     try {
@@ -35,7 +37,7 @@ export function OwnersListScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white dark:bg-slate-900 p-4">
+    <View className="flex-1 bg-white dark:bg-slate-900 px-4 pt-4">
       <View className="flex-row items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2 mb-4">
         <Ionicons name="search" size={20} color="gray" />
         <TextInput 
@@ -50,6 +52,7 @@ export function OwnersListScreen() {
       <FlatList
         data={owners}
         keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         ListEmptyComponent={<Text className="text-center text-slate-500 mt-10">No owners found</Text>}
         renderItem={({ item }) => (
           <View className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl mb-3 flex-row justify-between items-center shadow-sm">
@@ -58,7 +61,10 @@ export function OwnersListScreen() {
               {item.phoneNumber && <Text className="text-slate-500">{item.phoneNumber}</Text>}
               {item.village && <Text className="text-slate-500">{item.village}</Text>}
             </View>
-            <View className="flex-row">
+            <View className="flex-row items-center">
+              <TouchableOpacity onPress={() => navigation.navigate('EditOwner', { ownerId: item.id })} className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg mr-2">
+                <Ionicons name="pencil" size={20} color="#3b82f6" />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDelete(item.id)} className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
                 <Ionicons name="trash" size={20} color="red" />
               </TouchableOpacity>
@@ -68,7 +74,8 @@ export function OwnersListScreen() {
       />
 
       <TouchableOpacity 
-        className="absolute bottom-6 right-6 bg-primary w-14 h-14 rounded-full items-center justify-center shadow-lg"
+        className="absolute right-6 bg-primary w-14 h-14 rounded-full items-center justify-center shadow-lg"
+        style={{ bottom: Math.max(insets.bottom + 24, 24) }}
         onPress={() => navigation.navigate('AddOwner')}
       >
         <Ionicons name="add" size={30} color="white" />

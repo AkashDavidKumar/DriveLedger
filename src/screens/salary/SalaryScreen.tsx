@@ -1,10 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DashboardService } from '../../services/DashboardService';
 import { SalaryPaymentService } from '../../services/SalaryPaymentService';
 
 export function SalaryScreen() {
+  const insets = useSafeAreaInsets();
   const [stats, setStats] = useState<any>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,13 +72,16 @@ export function SalaryScreen() {
   );
 
   return (
-    <View className="flex-1 bg-white dark:bg-slate-900">
+    <View 
+      className="flex-1 bg-white dark:bg-slate-900"
+      style={{ paddingTop: insets.top }}
+    >
       <FlatList
         data={timeline}
         ListHeaderComponent={renderHeader}
         keyExtractor={item => item.payment.id}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         ListEmptyComponent={<Text className="text-center text-slate-500 mt-10">No payments found</Text>}
         renderItem={({ item }) => (
           <View className="mx-4 mb-3 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">

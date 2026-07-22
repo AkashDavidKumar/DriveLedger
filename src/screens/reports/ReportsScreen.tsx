@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { ReportService } from '../../services/ReportService';
@@ -9,6 +10,7 @@ import { FilterBar } from '../../components/FilterBar';
 
 export function ReportsScreen() {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const [exporting, setExporting] = useState(false);
   
@@ -87,6 +89,7 @@ export function ReportsScreen() {
   return (
     <ScrollView 
       className="flex-1 bg-slate-50 dark:bg-slate-900"
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View className="p-4">

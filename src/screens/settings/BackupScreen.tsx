@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import { BackupService } from '../../services/BackupService';
@@ -9,6 +10,7 @@ export function BackupScreen() {
   const [backups, setBackups] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
+  const insets = useSafeAreaInsets();
 
   const loadBackups = useCallback(async () => {
     try {
@@ -143,7 +145,7 @@ export function BackupScreen() {
       <FlatList
         data={backups}
         keyExtractor={item => item.filename}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 24 }}
         ListEmptyComponent={<Text className="text-slate-500 text-center mt-4">No local backups found.</Text>}
         renderItem={({ item }) => (
           <View className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 mb-3">
